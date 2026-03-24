@@ -21,7 +21,8 @@ struct watch_dir {
 
 static struct fsnotify_group *g;
 
-static int ksu_handle_inode_event(struct fsnotify_mark *mark, u32 mask,
+// 1. Renomeie a função original (Adicionando _original)
+static int ksu_handle_inode_event_original(struct fsnotify_mark *mark, u32 mask,
 				  struct inode *inode, struct inode *dir,
 				  const struct qstr *file_name, u32 cookie)
 {
@@ -37,8 +38,24 @@ static int ksu_handle_inode_event(struct fsnotify_mark *mark, u32 mask,
 	return 0;
 }
 
+// 2. Adicione o adaptador para o Kernel 5.4
+static int ksu_handle_event_adapter(struct fsnotify_group *group, struct inode *inode, u32 mask, const void *data, int data_type, const struct qstr *file_name, u32 cookie, struct fsnotify_iter_info *iter_info)
+{
+    struct inode *file_inode = NULL;
+    
+    if (data_type == FSNOTIFY_EVENT_INODE) {
+        file_inode = (struct inode *)data;
+    } else if (data_type == FSNOTIFY_EVENT_PATH) {
+        file_inode = d_inode(((struct path *)data)->dentry);
+    }
+
+    // Chama a lógica original do tracker
+    return ksu_handle_inode_event_original(NULL, mask, file_inode, inode, file_name, cookie);
+}
+
+// 3. Atualize a struct apontando para o adaptador e usando o nome correto (.handle_event)
 static const struct fsnotify_ops ksu_ops = {
-	.handle_inode_event = ksu_handle_inode_event,
+	.handle_event = ksu_handle_event_adapter,
 };
 
 static int add_mark_on_inode(struct inode *inode, u32 mask,
