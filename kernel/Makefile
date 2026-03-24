@@ -1,3 +1,12 @@
+# --- FORÇA BRUTA DE CONFIGURAÇÕES RKSU + SUSFS ---
+ccflags-y += -DCONFIG_KSU=1
+ccflags-y += -DCONFIG_KSU_MANUAL_HOOK=1
+ccflags-y += -DCONFIG_KSU_SUSFS=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SUS_MOUNT=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SUS_PATH=1
+ccflags-y += -DCONFIG_KSU_SUSFS_SUS_KSTAT=1
+ccflags-y += -DCONFIG_KSU_SUSFS_FORBID_OPEN_KSU_PATCH=1
+# -------------------------------------------------
 KDIR := $(KDIR)
 MDIR := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
